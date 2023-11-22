@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CarController extends Controller
 {
+    const PATH_VIEW = 'cars.';
+    const PATH_UPLOAD = 'cars';
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         //
+        $data = Car::query()->latest()->paginate(5);
+        return view(self::PATH_VIEW.__FUNCTION__,compact('data'));
     }
 
     /**
@@ -21,6 +26,7 @@ class CarController extends Controller
     public function create()
     {
         //
+        return view(self::PATH_VIEW.__FUNCTION__);
     }
 
     /**
@@ -29,6 +35,14 @@ class CarController extends Controller
     public function store(Request $request)
     {
         //
+        $data = $request->except('img');
+
+        if ($request->hasFile('img')) {
+            $data['img'] = Storage::put(self::PATH_UPLOAD,$request->file('img'));
+        }
+
+        Car::query()->create($data);
+        return back()->with('msg','thêm thành công');
     }
 
     /**
@@ -37,6 +51,7 @@ class CarController extends Controller
     public function show(Car $car)
     {
         //
+        return view(self::PATH_VIEW.__FUNCTION__,compact('car'));
     }
 
     /**
@@ -45,6 +60,7 @@ class CarController extends Controller
     public function edit(Car $car)
     {
         //
+        return view(self::PATH_VIEW.__FUNCTION__,compact('car'));
     }
 
     /**
@@ -53,6 +69,22 @@ class CarController extends Controller
     public function update(Request $request, Car $car)
     {
         //
+        $data = $request->except('img');
+
+        if ($request->hasFile('img')) {
+            $data['img'] = Storage::put(self::PATH_UPLOAD,$request->file('img'));
+        }
+        $old = $car->img;
+
+        $car->update($data);
+
+        if($request->hasFile('img') && Storage::exists('img')){
+            Storage::delete($old);
+        }
+
+        return back()->with('msg','sửa thành công');
+
+
     }
 
     /**
@@ -61,5 +93,10 @@ class CarController extends Controller
     public function destroy(Car $car)
     {
         //
+        $car->delete();
+        if (Storage::exists('img')) {
+            Storage::delete('img');
+        }
+        return back()->with('msg', 'delete successfully');
     }
 }

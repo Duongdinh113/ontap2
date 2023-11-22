@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class DeviceController extends Controller
 {
@@ -35,6 +36,21 @@ class DeviceController extends Controller
     public function store(Request $request)
     {
         //
+       $request->validate([
+        'name' =>'required',
+        'serial' =>'required|max:255|unique:devices|',
+        'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'model' =>'required',
+        'is_active' => [
+            'required',
+            Rule::in([
+                Device::isactive,
+                Device::is_active,
+                ])
+            ],
+
+            'describe' =>'required',
+       ]);
         $data = $request->except('img');
         if ($request->hasFile('img')) {
             $data['img'] = Storage::put(self::PATH_UPLOAD,$request->file('img'));

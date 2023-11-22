@@ -7,6 +7,15 @@
     <div class="alert alert-success">{{ \Session::get('msg') }}</div>
 
 @endif
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 <form class="row" action="{{ route ('devices.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <label for="name">name</label>
