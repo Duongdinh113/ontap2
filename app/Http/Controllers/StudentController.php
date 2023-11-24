@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-class DeviceController extends Controller
+class StudentController extends Controller
 {
-    const PATH_VIEW = 'devices.';
-    const PATH_UPLOAD = 'devices';
+    const PATH_VIEW = 'students.';
+    const PATH_UPLOAD = 'students';
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         //
-        $data = Device::query()->latest()->paginate(5);
+        $data = Student::query()->latest()->paginate(5);
         return view(self::PATH_VIEW.__FUNCTION__, compact('data'));
+
     }
 
     /**
@@ -36,75 +37,73 @@ class DeviceController extends Controller
     public function store(Request $request)
     {
         //
-       $request->validate([
-        'name' =>'required',
-        'serial' =>'required|max:50|unique:devices|',
-        'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'model' =>'required',
-        'is_active' => [
-            'required',
+        $request->validate([
+            'name' =>'required|max:50',
+            'code' =>'required|unique:students',
+            'date_of_birth' =>'required',
+            'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
             Rule::in([
-                Device::isactive,
-                Device::is_active,
+                Student::is_active,
+                Student::is_not_active,
                 ])
-            ],
+            ]);
 
-
-       ]);
         $data = $request->except('img');
-        if ($request->hasFile('img')) {
+        if($request->hasFile('img')){
             $data['img'] = Storage::put(self::PATH_UPLOAD,$request->file('img'));
         }
-        Device::query()->create($data);
+        Student::query()->create($data);
         return back()->with('msg','thêm thành công');
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Device $device)
+    public function show(Student $student)
     {
         //
-        return view(self::PATH_VIEW.__FUNCTION__, compact('device'));
+        return view(self::PATH_VIEW.__FUNCTION__,compact('student'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Device $device)
+    public function edit(Student $student)
     {
         //
-        return view(self::PATH_VIEW.__FUNCTION__, compact('device'));
+        return view(self::PATH_VIEW.__FUNCTION__,compact('student'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Device $device)
+    public function update(Request $request, Student $student)
     {
         //
         $request->validate([
-            'name' =>'required',
-            'serial' =>'|max:50|',
+            'name' =>'required|max:50',
+            'code' =>'required',
+            'date_of_birth' =>'required',
             'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'model' =>'required',
-            'is_active' => [
-                'required',
-                Rule::in([
-                    Device::isactive,
-                    Device::is_active,
-                    ])
-                ],
-           ]);
+
+            Rule::in([
+                Student::is_active,
+                Student::is_not_active,
+                ])
+            ]);
+
         $data = $request->except('img');
-        if ($request->hasFile('img')) {
+        if($request->hasFile('img')){
+            Storage::delete($student->img);
             $data['img'] = Storage::put(self::PATH_UPLOAD,$request->file('img'));
         }
-        $old = $device->img;
+        $student->update($data);
 
-        $device->update($data);
+        $old = $student->img;
 
-        if($request->hasFile('img') && Storage::exists('img')) {
+        if(Storage::has('img')){
             Storage::delete($old);
         }
         return back()->with('msg','sửa thành công');
@@ -113,13 +112,15 @@ class DeviceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Device $device)
+    public function destroy(Student $student)
     {
         //
-        $device->delete();
+        $student->delete();
+
         if(Storage::exists('img')){
             Storage::delete('img');
         }
-        return back()->with('msg','xóa thành công');
+
+        return back()->with('msg','Xóa thành công');
     }
 }

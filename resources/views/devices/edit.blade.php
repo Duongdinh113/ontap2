@@ -2,11 +2,21 @@
 
 @section('content')
 <h2>Form update device</h2>
-@if (\Session::has('msg'))
-    <div class="alert alert-success">{{ \Session::get('msg') }}</div>
-
+@if(\Session::has('msg'))
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong> {{ \Session::get('msg') }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+ @endif
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
 @endif
-
 <form class="row" action="{{ route ('devices.update',$device->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')

@@ -14,12 +14,12 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->text(100);
-            $table->string('serial')->unique()->text(100);
+            $table->string('name',100);
+            $table->string('serial',100)->unique();
             $table->string('model')->text(100);
-            $table->string('img')->nullable()->text(266);
+            $table->string('img',266)->nullable();
             $table->boolean('is_active')->default(value:Device::isactive);
-            $table->string('describe')->nullable()->text();
+            $table->string('describe')->nullable();
             $table->timestamps();
         });
     }

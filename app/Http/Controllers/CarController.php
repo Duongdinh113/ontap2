@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CarController extends Controller
 {
@@ -34,7 +35,20 @@ class CarController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'name' =>'required|unique:cars',
+            'brand' =>'required|max:255',
+            'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'is_active' => [
+                'required',
+                Rule::in([
+                    Car::one,
+                    Car::two,
+                    ])
+                ],
+           ]);
+
         $data = $request->except('img');
 
         if ($request->hasFile('img')) {
@@ -69,6 +83,19 @@ class CarController extends Controller
     public function update(Request $request, Car $car)
     {
         //
+        $request->validate([
+            'name' =>'required',
+            'brand' =>'required|max:255',
+            'img' =>'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'is_active' => [
+                'required',
+                Rule::in([
+                    Car::one,
+                    Car::two,
+                    ])
+                ],
+           ]);
+
         $data = $request->except('img');
 
         if ($request->hasFile('img')) {
@@ -76,11 +103,13 @@ class CarController extends Controller
         }
         $old = $car->img;
 
-        $car->update($data);
-
-        if($request->hasFile('img') && Storage::exists('img')){
+        if($request->hasFile('img') | Storage::exists('img')){
             Storage::delete($old);
         }
+
+        $car->update($data);
+
+
 
         return back()->with('msg','sửa thành công');
 

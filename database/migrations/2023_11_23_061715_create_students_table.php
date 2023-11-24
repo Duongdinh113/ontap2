@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Car;
+use App\Models\Student;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,13 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cars', function (Blueprint $table) {
+        Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->string('name',100)->unique();
-            $table->string('brand',100);
-            $table->string('img')->nullable();
-            $table->boolean('is_active')->default(value:Car::one);
-            $table->text('describe')->nullable();
+            $table->string('name',100);
+            $table->string('code',10)->unique();
+            $table->date('date_of_birth')->nullable();
+            $table->string('img',255);
+            $table->boolean('is_active')->default(value:Student::is_active);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cars');
+        Schema::dropIfExists('students');
     }
 };

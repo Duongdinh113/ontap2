@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StudentController;
+use App\Models\Student;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +23,5 @@ Route::get('/', function () {
 });
 Route::resource('devices', DeviceController::class);
 Route::resource('cars', CarController::class);
+Route::resource('products', ProductController::class);
+Route::resource('students', StudentController::class);
